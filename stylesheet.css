@@ -4,5 +4,6 @@
 }
 
 .week-table tr th {
+	background-color: red;
 	width: 12.5%;
 }
