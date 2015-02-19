@@ -4,5 +4,5 @@ $(document).ready(function() {
 			//Do stuff
 		}
 	});
-	$("td").html("o");
+	$(".week-table tr td").html("o");
 });
