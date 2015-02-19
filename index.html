@@ -3,18 +3,21 @@
 <html>
 
 	<head>
+	
 		<title>Week Visualizer</title>
 		<link type='text/css' rel='stylesheet' href='stylesheet.css'>
 		<script type='text/javascript' src='https://code.jquery.com/jquery-2.1.1.min.js'></script>
 		<!--<script type='text/javascript' src='http://blurjs.com/blur.min.js'></script>-->
 		<script type='text/javascript' src='script.js'></script>
+		
 	</head>
 	
 	<body>
-		<label for="weekend">Inlude the weekend?</label>
-		<input type="checkbox" id="weekend" value="true"><br>
-		<label for="starthour">Starting hour to include</label>
-		<select id="starthour">
+	
+		<label for="cb_weekend">Inlude the weekend?</label>
+		<input type="checkbox" id="cb_weekend" value="true"><br>
+		<label for="list_starthour">Starting hour to include</label>
+		<select id="list_starthour">
 			<option value="24">24</option>
 			<option value="1">1</option>
 			<option value="2">2</option>
@@ -40,8 +43,8 @@
 			<option value="22">22</option>
 			<option value="23">23</option>
 		</select>
-		<label for="endhour">Ending hour to include</label>
-		<select id="endhour">
+		<label for="list_endhour">Ending hour to include</label>
+		<select id="list_endhour">
 			<option value="24">24</option>
 			<option value="1">1</option>
 			<option value="2">2</option>
@@ -67,12 +70,21 @@
 			<option value="22">22</option>
 			<option value="23">23</option>
 		</select>
+
 		<div class="week-container">
 			<table class="week-table">
-				<tr>
+				<tr class="hour_23">
+					<td class="mon weekday"></td>
+					<td class="tue weekday"></td>
+					<td class="wed weekday"></td>
+					<td class="thu weekday"></td>
+					<td class="fri weekday"></td>
+					<td class="sat weekend"></td>
+					<td class="sun weekend"></td>
 				</tr>
 			</table>
 		</div>
+		
 	</body>
 	
 </html>
