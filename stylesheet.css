@@ -1,7 +1,4 @@
 .week-table tr td {
 	background-color: yellow;
-}
-
-table {
-	table-layout: fixed;
+	width: (100/8)%;
 }
