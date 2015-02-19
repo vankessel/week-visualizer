@@ -1,7 +1,9 @@
 $(document).ready(function() {
 	$("#cb_weekend").change(function() {
 		if(this.checked) {
-			//Do stuff
+			$(".weekend").hide();
+		} else {
+			$(".weekend").show();
 		}
 	});
 	$(".week-table tr td").html("o");
