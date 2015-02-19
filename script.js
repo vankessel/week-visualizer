@@ -4,5 +4,5 @@ $(document).ready(function() {
 			//Do stuff
 		}
 	});
-	$("td").html("i");
+	$("td").html("o");
 });
