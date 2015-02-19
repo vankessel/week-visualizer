@@ -1,3 +1,7 @@
+.week-table {
+	width: 100%;
+}
+
 .week-table tr td {
 	background-color: red;
 	width: 12.5%;	
