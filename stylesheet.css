@@ -1,4 +1,8 @@
 .week-table tr td {
 	background-color: red;
+	width: 12.5%;	
+}
+
+.week-table tr th {
 	width: 12.5%;
 }
