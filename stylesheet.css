@@ -1,10 +1,14 @@
-.week-table {
+#week-table {
 	width: 100%;
 }
 
-.week-table tr td {
+#week-table tr td {
 	background-color: red;
 	width: 4096px;	
+}
+
+#week-table tr td.free {
+	background-color: green;
 }
 
 .container {
@@ -12,3 +16,4 @@
 
 .right {
 }
+
