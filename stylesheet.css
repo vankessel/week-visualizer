@@ -3,12 +3,16 @@
 }
 
 #week-table tr td {
-	background-color: red;
+	background-color: green;
 	width: 4096px;	
 }
 
 #week-table tr td.free {
-	background-color: green;
+	background-color: blue;
+}
+
+#week-table tr td.busy {
+	background-color: red;
 }
 
 .container {

@@ -7,6 +7,7 @@ $(document).ready(function() {
 	//Initialize start and end hours to those selected in the html
 	var startHour = parseInt($("#list_startHour").val());
 	var endHour = parseInt($("#list_endHour").val());
+	var contextMenu = document.oncontextmenu; //Saving the menu for later to re-enable right clicking
 	
 	clipTable();
 	
@@ -55,12 +56,31 @@ $(document).ready(function() {
 		}
 	});
 	
-	//Ability to select free times
-	$("#week-table tr:not(.half) td").click(function() {
-		$(this).toggleClass("free");
+	//Ability to select free, busy, and maybe times
+	$("#week-table tr td").mousedown(function(event) {
+		switch (event.which) {
+			//Left mouse
+			case 1:
+				$(this).removeClass("busy");
+				$(this).addClass("free");
+				break;
+			//Middle mouse
+			case 2:
+				$(this).removeClass("free busy");
+				break;
+			//Right mouse. Handled below to disable the context menu
+			case 3:
+				break;
+			default:
+				alert("Invalid click. Left mouse = free, right mouse = busy, middle mouse = none")
+		}
 	});
-	$("#week-table tr.half td").click(function() {
-		$(this).toggleClass("free");
+	
+	//Disable context menu and perform additional actions
+	$("#week-table tr td").bind("contextmenu", function(e) {
+		$(this).removeClass("free");
+		$(this).addClass("busy");
+		return false;
 	});
 	
 	/**************************************************************************
@@ -88,20 +108,20 @@ $(document).ready(function() {
 	}
 	function hideRow(n) {
 		$("#week-table tr.hour:eq(" + n + ")").hide();
-		$("#week-table tr.hour:eq(" + n + ") td").removeClass("free");
+		$("#week-table tr.hour:eq(" + n + ") td").removeClass("free busy");
 	}
 	function showColumn(m) {
 		$("#week-table tr *:nth-child(" + (m+1) + ")").show(); //(m+1) to keep things 0 index based. For some reason :eq is not working.
 	}
 	function hideColumn(m) {
 		$("#week-table tr *:nth-child(" + (m+1) + ")").hide();
-		$("#week-table tr td:nth-child(" + (m+1) + ")").removeClass("free");
+		$("#week-table tr td:nth-child(" + (m+1) + ")").removeClass("free busy");
 	}
 	
 	//Show and hide full hours
 	function hideHour(n) {
 		$("#week-table tr.hour_" + n).hide();
-		$("#week-table tr.hour_" + n + " td").removeClass("free");
+		$("#week-table tr.hour_" + n + " td").removeClass("free busy");
 	}
 	function showHour(n) {
 		$("#week-table tr.hour_" + n).show();
@@ -110,7 +130,7 @@ $(document).ready(function() {
 	//Show and hide half hours
 	function hideHalfHours() {
 		$("#week-table tr.half").hide();
-		$("#week-table tr.half td").removeClass("free");
+		$("#week-table tr.half td").removeClass("free busy");
 	}
 	function showHalfHours() {
 		$("#week-table tr.half").show();
