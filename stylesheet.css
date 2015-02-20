@@ -15,9 +15,14 @@
 	background-color: red;
 }
 
+#week-container {
+	clear: both;
+}
+
 .container {
 }
 
-.right {
+.info {
+	float: left;
 }
 

@@ -77,7 +77,7 @@ $(document).ready(function() {
 	});
 	
 	//Disable context menu and perform additional actions
-	$("#week-table tr td").bind("contextmenu", function(e) {
+	$("#week-table tr td").bind("contextmenu", function() {
 		$(this).removeClass("free");
 		$(this).addClass("busy");
 		return false;
