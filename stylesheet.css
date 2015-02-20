@@ -24,5 +24,10 @@
 
 .info {
 	float: left;
+	text-align: right;
 }
 
+.left {
+	margin-left: 32px;
+	text-align: left;
+}
