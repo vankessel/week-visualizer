@@ -1,21 +1,27 @@
 $(document).ready(function() {
 	
-	/**************************************************************************
+	/***************************************************************************
 	**Initialization
 	*/
 	
 	//Initialize start and end hours to those selected in the html
 	var startHour = parseInt($("#list_startHour").val());
 	var endHour = parseInt($("#list_endHour").val());
-	var contextMenu = document.oncontextmenu; //Saving the menu for later to re-enable right clicking
 	
 	clipTable();
 	
-	/**************************************************************************
+	//Disable context menu and apply classes
+	$("#week-table tr td").on("contextmenu", function() {
+		$(this).removeClass("free busy");
+		return false;
+	});
+	
+	/***************************************************************************
 	**Events
 	*/
 	
 	//Constrain the start and end hours to sensible values
+	//Then update the table to reflect the changes
 	$("#list_startHour").change(function() {
 		startHour = parseInt($(this).val());
 		if(endHour < startHour) {
@@ -56,34 +62,36 @@ $(document).ready(function() {
 		}
 	});
 	
+	//Full reset button
+	$("#btn_reset").click(function(){
+        $("#week-table tr td").removeClass("free busy");
+    });
+	
 	//Ability to select free, busy, and maybe times
 	$("#week-table tr td").mousedown(function(event) {
 		switch (event.which) {
 			//Left mouse
 			case 1:
-				$(this).removeClass("busy");
-				$(this).addClass("free");
+				//If green toggle one, otherwise toggle both
+				if(!$(this).hasClass("free") && !$(this).hasClass("busy")) {
+					$(this).toggleClass("free");
+				}
+				else {
+					$(this).toggleClass("free");
+					$(this).toggleClass("busy");
+				}
 				break;
-			//Middle mouse
+			//Middle mouse. Unused
 			case 2:
-				$(this).removeClass("free busy");
 				break;
-			//Right mouse. Handled below to disable the context menu
+			//Right mouse. Handled in initialization to disable the context menu
 			case 3:
 				break;
 			default:
-				alert("Invalid click. Left mouse = free, right mouse = busy, middle mouse = none")
 		}
 	});
 	
-	//Disable context menu and perform additional actions
-	$("#week-table tr td").bind("contextmenu", function() {
-		$(this).removeClass("free");
-		$(this).addClass("busy");
-		return false;
-	});
-	
-	/**************************************************************************
+	/***************************************************************************
 	**Functions
 	*/
 	
@@ -127,7 +135,7 @@ $(document).ready(function() {
 		$("#week-table tr.hour_" + n).show();
 	}
 	
-	//Show and hide half hours
+	//Show and hide all half hours
 	function hideHalfHours() {
 		$("#week-table tr.half").hide();
 		$("#week-table tr.half td").removeClass("free busy");
