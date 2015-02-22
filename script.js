@@ -67,7 +67,7 @@ $(document).ready(function() {
         $("#week-table tr td").removeClass("free busy");
     });
 	
-	//Ability to select free, busy, and maybe times
+	//Ability to select free times, busy times, and reset
 	$("#week-table tr td").mousedown(function(event) {
 		switch (event.which) {
 			//Left mouse
@@ -104,9 +104,10 @@ $(document).ready(function() {
 			else {
 				hideHour(n);
 			}
-			if(!$("#cb_showHalfHour").prop("checked")) {
-				hideHalfHours();
-			}
+		}
+		// Hide the half hours if the relevant checkbox is checked
+		if(!$("#cb_showHalfHour").prop("checked")) {
+			hideHalfHours();
 		}
 	}
 	
@@ -139,9 +140,13 @@ $(document).ready(function() {
 	function hideHalfHours() {
 		$("#week-table tr.half").hide();
 		$("#week-table tr.half td").removeClass("free busy");
+		//TODO: For every first half of the hour with class
+		//Add same class to second half of the hour.
+		//E.g. Set 1:00 as busy, hide half hours. Now the 1:00-1:30 block
+		//is set, but the 1:30-2:00 block is not. This is bad. In the
+		//"full hour" mode, a selection should cover 1:00-2:00.
 	}
 	function showHalfHours() {
 		$("#week-table tr.half").show();
 	}
 });
-
