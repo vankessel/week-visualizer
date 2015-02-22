@@ -10,4 +10,4 @@ I'm using jQuery, it's a javascript framework. I imagine if you've used javascri
 
 Imagine this is a 2d array of size 48x7 (Half hours by days), and selecting boxes fills them in with 1, 0, or -1. No matter how the visible size of the table changes on the website, the exported data will be of this size.
 
-If my code, comments, or formatting suck and you can't tell what's going on, let me know. It would help me as much as you. Ask any questions about anything. I've never written code for other's to see before, and I'm sure for some of you it's your first time having to interpret another person's code. So if it's too confusing just message me or leave a comment on the facebook post.
+If my code, comments, or formatting suck and you can't tell what's going on, let me know. It would help me as much as you. Ask any questions about anything. I've never written code for others to read before, and I'm sure for some of you it's your first time having to interpret another's code. So if it's too confusing just message me or leave a comment on the facebook post.
