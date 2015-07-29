@@ -3,6 +3,15 @@ $(document).ready(function() {                                                  
     /***************************************************************************
     **Initialization
     */
+	
+    /*
+	Parse.initialize("viAaWs9CN1lZEZDhwotmYK6CnXemexeAnbmHfobX", "nT9VMVPNj0I53354nbc6NldWnWQkeZyM9w6rLqNU");  // initialize Parse
+	var TestObject = Parse.Object.extend("TestObject"); 
+	var testObject = new TestObject(); // declare a test object
+	testObject.save({foo: "bar"}).then(function(object) {  // save test data
+        alert("yay! it worked"); // I used this to see if it works
+    });  
+    */
     
     //Initialize start and end hours to those selected in the html
     var startHour = parseInt($("#list_startHour").val());
@@ -19,6 +28,9 @@ $(document).ready(function() {                                                  
     //Disable context menu and apply classes
     $("#week-table tr td").on("contextmenu", function() {                       //$("Element to do stuff on").on("Event to trigger function", function(){code});
         $(this).removeClass("free busy");                                       //this = "#week-table tr td", remove both free and busy classes
+        if(!$("#cb_showHalfHour").prop("checked")) {
+            copyHoursToHalfHours();
+        }
         return false;                                                           //return false removes the right-click menu
     });
     
@@ -116,6 +128,9 @@ $(document).ready(function() {                                                  
                     $(this).toggleClass("free");
                     $(this).toggleClass("busy");
                 }
+                if(!$("#cb_showHalfHour").prop("checked")) {
+                    copyHoursToHalfHours();
+                }
                 break;
             //Middle mouse. Unused
             case 2:
@@ -129,8 +144,7 @@ $(document).ready(function() {                                                  
     
     //Detects output button press and calls function to make a string.
     $("#finished").click(function() {
-        $("#output").val(getIntArray().join(""));
-        document.getElementById("compressedOutput").innerHTML = encodeIntArray(getIntArray());
+        $("#output").val(encodeIntArray(getIntArray()));
     });
     
     /***************************************************************************
@@ -231,7 +245,7 @@ $(document).ready(function() {                                                  
     //Show and hide all half hours
     function showHalfHours() {
         $("#week-table tr.half").show();
-        copyHoursToHalfHours()
+        copyHoursToHalfHours();
     }
     function hideHalfHours() {
         $("#week-table tr.half").hide();
@@ -375,7 +389,11 @@ $(document).ready(function() {                                                  
     
     //May be redundant, but gonna keep this method here just in-case
     function parseString(string) {
-        return string.split(",");
+        string = string.split(",");
+        for(var i = 0; i < string.length; i++) {
+            string[i] = decodeString(string[i]);
+        }
+        return string;
     }
     
     //"How Not to Sort by Average Rating" function
@@ -493,6 +511,15 @@ $(document).ready(function() {                                                  
     function decodeString(string) {
         var encodedArray = string.split("").map(function(x){return x.charCodeAt(0)-256});
         
+        var leadingByte = encodedArray.shift();
+        var trailingByte = encodedArray.pop();
+        var middleBytesArray = encodedArray;
+        
+        var intArray = decodeLeadingByte(leadingByte);
+        intArray = intArray.concat(decodeMiddleBytes(middleBytesArray));
+        intArray = intArray.concat(decodeTrailingByte(trailingByte));
+        
+        return intArray;
     }
 
     //This is the first byte. The first few bits determine the type (0, 1, or 2)
@@ -500,10 +527,10 @@ $(document).ready(function() {                                                  
     function encodeLeadingByte(intArray) {
         //shift() returns the first element and removes it from the array
         var type = intArray.shift();
-        //How many times does the type of the removed element repeat? (Total cells of type = repeats + 1)
+        //How many times does the type of the removed element repeat? (Total cells of type = repeatLength + 1)
         var repeatLength = 0;
         //How I chose to encode:
-        //If 1st bit is 1, then the type is 2
+        //If the type is 2, then the 1st bit is 1
         //use the other 7 for repeatLength
         if(type === 2) {
             //Find out how many repeats there are within the max I can store
@@ -512,29 +539,58 @@ $(document).ready(function() {                                                  
                 repeatLength += 1;
             }
             //Create byte from the repeatLength
-            var byte = addPadding(repeatLength.toString(2), 8);
-            //Change 0th char to 1 (indicates type is 2, as I've said before)
-            byte = setCharAt(byte, 0, 1);
+            var stringByte = addPadding(repeatLength.toString(2), 8);
+            //Change leading digit to 1 (indicates type is 2, as I've said before)
+            stringByte = setCharAt(stringByte, 0, 1);
         }
-        //If 1st bit is 0, then the type is 0 or 1, encode the 2nd bit
-        //If the 2nd bit is 0, then the type is 0
-        //If the 2nd bit is 1, then the type is 1
+        //If the type is 0 or 1, the 1st bit is 0, then encode the 2nd bit
+        //If the type is 0, then the 2nd bit is 0
+        //If the type is 1, then the 2nd bit is 1
         //use the other 6 for repeatLength
         else {
             while(intArray[0] === type && repeatLength < 63) {
                 intArray.shift()
                 repeatLength += 1;
             }
-            var byte = addPadding(repeatLength.toString(2), 8);
-            byte = setCharAt(byte, 0, 0);
-            byte = setCharAt(byte, 1, type);
+            var stringByte = addPadding(repeatLength.toString(2), 8);
+            stringByte = setCharAt(stringByte, 0, 0);
+            stringByte = setCharAt(stringByte, 1, type);
         }
         //Return the decimal form of the byte
-        return parseInt(byte, 2);
+        return parseInt(stringByte, 2);
     }
     
     function decodeLeadingByte(leadingByte) {
+        var stringByte = addPadding(leadingByte.toString(2), 8);
+        var leadingArray = [];
+        var repeatLength;
         
+        //If the type of the repeating cell is 2
+        if(stringByte.charAt(0) === "1") {
+            stringByte = setCharAt(stringByte, 0, 0);
+            repeatLength = parseInt(stringByte, 2);
+            
+            for(var i = 0; i < repeatLength+1; i++) {
+                leadingArray.push(2);
+            }
+        }
+        else if(stringByte.charAt(1) === "1") {
+            stringByte = setCharAt(stringByte, 1, 0);
+            repeatLength = parseInt(stringByte, 2);
+            
+            for(var i = 0; i < repeatLength+1; i++) {
+                leadingArray.push(1);
+            }
+        }
+        else {
+            repeatLength = parseInt(stringByte, 2);
+            
+            for(var i = 0; i < repeatLength+1; i++) {
+                leadingArray.push(0);
+            }
+        }
+        
+        return leadingArray;
     }
 
     //Will explain this part later
@@ -584,11 +640,49 @@ $(document).ready(function() {                                                  
         for(var l = 0; l < byteArray.length; l++) {
             byteArray[l] = parseInt(byteArray[l], 2);
         }
+        
         return byteArray;
     }
     
-    function decodeMiddleBytes(byteArray) {
+    function decodeMiddleBytes(middleBytesArray) {
+        //How many digits to ignore from the right of the second last byte
+        var rightPadding = middleBytesArray[middleBytesArray.length-1];
+        var middleArray = [];
+        var decompressed = [];
+        var byteString = "";
         
+        for(var i = 0; i < middleBytesArray.length-2; i++) {
+            byteString += addPadding(middleBytesArray[i].toString(2), 8);
+        }
+        byteString += addPadding(middleBytesArray[middleBytesArray.length-2].toString(2), 8).substring(0, 8-rightPadding);
+        
+        //Split the byteString every 2 characters into an array
+        var cellArray = byteString.match(/.{1,2}/g);
+        
+        for(var j = 0; j < cellArray.length; j++) {
+            if(cellArray[j] === "00") {
+                middleArray.push(0);
+            }
+            else if(cellArray[j] === "01") {
+                middleArray.push(1);
+            }
+            else if(cellArray[j] === "10") {
+                middleArray.push(2);
+                decompressed.push("0");
+            }
+            else {
+                middleArray.push(2);
+                decompressed.push("1");
+            }
+        }
+        
+        decompressed = decompressed.join("").match(/.{1,2}/g);
+        if(decompressed === null) {decompressed = [];}
+        for(var k = 0; k < decompressed.length; k++) {
+            decompressed[k] = parseInt(decompressed[k], 2);
+        }
+        
+        return middleArray.concat(decompressed);
     }
 
     //Same idea as leading byte, but is last, and repeats go backwards, also
@@ -606,23 +700,57 @@ $(document).ready(function() {                                                  
                 intArray.pop();
                 repeatLength += 1;
             }
-            var byte = addPadding(repeatLength.toString(2), 8);
-            byte = setCharAt(byte, 0, 0);
+            var trailingByte = addPadding(repeatLength.toString(2), 8);
+            trailingByte = setCharAt(trailingByte, 0, 0);
         }
         else {
             while(intArray[intArray.length-1] === type && repeatLength < 63) {
                 intArray.pop();
                 repeatLength += 1;
             }
-            var byte = addPadding(repeatLength.toString(2), 8);
-            byte = setCharAt(byte, 0, 1);
-            byte = setCharAt(byte, 1, type-1);
+            var trailingByte = addPadding(repeatLength.toString(2), 8);
+            trailingByte = setCharAt(trailingByte, 0, 1);
+            trailingByte = setCharAt(trailingByte, 1, type-1);
         }
-        return parseInt(byte, 2);
+        
+        return parseInt(trailingByte, 2);
     }
     
     function decodeTrailingByte(trailingByte) {
+        var stringByte = addPadding(trailingByte.toString(2), 8);
+        var trailingArray = [];
+        var repeatLength;
         
+        //Type 0
+        if(stringByte.charAt(0) === "0") {
+            repeatLength = parseInt(stringByte, 2);
+            
+            for(var i = 0; i < repeatLength+1; i++) {
+                trailingArray.push(0);
+            }
+        }
+        //Type 1
+        else if(stringByte.charAt(1) === "0") {
+            stringByte = setCharAt(stringByte, 0, 0);
+            
+            repeatLength = parseInt(stringByte, 2);
+            
+            for(var i = 0; i < repeatLength+1; i++) {
+                trailingArray.push(1);
+            }
+        }
+        //Type 2
+        else {
+            stringByte = setCharAt(stringByte, 0, 0);
+            stringByte = setCharAt(stringByte, 1, 0);
+            
+            repeatLength = parseInt(stringByte, 2);
+            
+            for(var i = 0; i < repeatLength+1; i++) {
+                trailingArray.push(2);
+            }
+        }
+        return trailingArray;
     }
 
     //Adds left-padding of 0s until the length reaches a multiple of the width
@@ -645,7 +773,3 @@ $(document).ready(function() {                                                  
         return str.substr(0,index) + chr + str.substr(index+1);
     }
 });
-function decodeString(string) {
-        var encodedArray = string.split("").map(function(x){return x.charCodeAt(0)-256});
-        console.log(encodedArray);
-    }
