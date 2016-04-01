@@ -12,7 +12,7 @@
     <body>
         <div class="container">
             <span class="radGroup_view">
-                <label                     for="rad_viewIndex"       >Index</label>
+                <label                     for="rad_viewIndex"       >Editor</label>
                 <input checked type="radio" id="rad_viewIndex"   name="view" value="index">
                 
                 <label                     for="rad_viewHeatMap"     >Heat Map</label>
@@ -27,7 +27,7 @@
                 <label for="cb_weekend"     >Include the weekend?</label>
                 <input checked type="checkbox" id="cb_weekend"      value="true"><br>
                 
-                <label for="cb_showHalfHour">Include half hours?</label>
+                <label for="cb_showHalfHour">Half hour increments?</label>
                 <input checked type="checkbox" id="cb_showHalfHour" value="true"><br>
                 
                 <label for="list_startHour">Start hour</label>
@@ -110,14 +110,14 @@
                 <div class="container">
                     <span>Cells after end hour default to:</span>
                     <span class="radGroup_default right">
-                        <label                     for="rad_endCutoffDefault_busy">busy</label>
                         <input         type="radio" id="rad_endCutoffDefault_busy" name="endCutoffDefault" value="busy">
+                        <label                     for="rad_endCutoffDefault_busy">busy</label>
                         
-                        <label                     for="rad_endCutoffDefault"     >nothing</label>
                         <input checked type="radio" id="rad_endCutoffDefault"      name="endCutoffDefault" value="">
+                        <label                     for="rad_endCutoffDefault"     >nothing</label>
                         
-                        <label                     for="rad_endCutoffDefault_free">free</label>
                         <input         type="radio" id="rad_endCutoffDefault_free" name="endCutoffDefault" value="free">
+                        <label                     for="rad_endCutoffDefault_free">free</label>
                     </span>
                 </div>
                 
